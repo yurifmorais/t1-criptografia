@@ -1,78 +1,71 @@
-//criar uma funcao para criptografar. vai receber o texto e N como parametros;
-//criar uma funcao para descriptografar. vai receber o texto criptografado e N como parametros;
-
-//tenho que fazer o tratamento para quando o texto tiver uma LETRA 'z" por ex. ai devo contar do inicio do alfabeto, pois nao tem nada dps do Z
-//resolvi o problema acima adicionando o alfabeto novamente na string. mas deve ter um metodo melhor;
-//prox passo é descriptografar
+////criar uma funcao para criptografar. vai receber o texto e N como parametros;
+////criar uma funcao para descriptografar. vai receber o texto criptografado e N como parametros;
+//
+////tenho que fazer o tratamento para quando o texto tiver uma LETRA 'z" por ex. ai devo contar do inicio do alfabeto, pois nao tem nada dps do Z
+////resolvi o problema acima adicionando o alfabeto novamente na string. mas deve ter um metodo melhor;
+////prox passo é descriptografar
 import java.util.Scanner;
+
 public class Main {
-    public static void criptografa(){
-        Scanner sc = new Scanner(System.in);
-        //recebe os dados para serem criptografados
-        System.out.println("Informe o texto a ser criptografado: ");
-        String texto = sc.nextLine();
-        System.out.println("Informe o valor de K: ");
-        int k = sc.nextInt();
 
-        //tratando o texto de entrada
-        texto = texto.toLowerCase();
-        texto = texto.replaceAll("\\s", "");//retira os espacos
-        System.out.println("TEXTO DE ENTRADA: " + texto);
+    private static final String ALFABETO = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
 
-        //GOL K = 4;
-        //KSP
-        //PEGO A POSICAO DO G+4
-
-        //criptografando
-        String alfabeto = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
-        int x = 0, posicao;
-        char letra;
-        String textoCriptografado = "";
-        while (x < texto.length()){
-            letra = texto.charAt(x);
-            posicao = alfabeto.indexOf(letra);
-            //System.out.println("alfabeto.charAt(letra): " + alfabeto.charAt(posicao));
-            //System.out.println(alfabeto.charAt(posicao+k));
-            textoCriptografado = textoCriptografado + alfabeto.charAt(posicao+k);
-            x++;
-        }
-        System.out.println("Texto criptografado: " + textoCriptografado);
-    }
-
-    public static void descriptografa() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Informe o texto a ser descriptografado: ");
-        String texto = sc.nextLine();
-
-        //tratando o texto de entrada
-        texto = texto.toLowerCase();
-        texto = texto.replaceAll("\\s", "");//retira os espacos
-        System.out.println("TEXTO DE ENTRADA: " + texto);
-
-        //criptografando
-        String alfabeto = "abcdefghijklmnopqrstuvwxyz";//ihyevhs
-        int x = 0, posicao;
-        char letra;
-        String textoCriptografado = "";
-        int i = 1;
-        while (i < 11){//ihyevhs
-            while (x < texto.length()) {
-                letra = texto.charAt(x);
-                posicao = alfabeto.indexOf(letra);
-                //as vezes funciona e as vezes nao
-                if (posicao > i) textoCriptografado = textoCriptografado + alfabeto.charAt(posicao - i);
-                else textoCriptografado = textoCriptografado + alfabeto.charAt(posicao%26 - posicao);
-                x++;
+    public static void criptografa(String texto, int k) {
+        texto = trataTextoEntrada(texto);
+        StringBuilder textoCriptografado = new StringBuilder();
+        for (char letra : texto.toCharArray()) {
+            int posicao = ALFABETO.indexOf(letra);
+            if (posicao != -1) {
+                char letraCriptografada = ALFABETO.charAt(posicao + k);
+                textoCriptografado.append(letraCriptografada);
+            } else {
+                textoCriptografado.append(letra);
             }
-            System.out.println("Possivel texto com K = "+ i + ": " + textoCriptografado);
-            i++;
-            x=0;
-            textoCriptografado = "";
         }
-        //System.out.println("Texto criptografado: " + textoCriptografado);
-
+        System.out.println("Texto criptografado: " + textoCriptografado.toString());
     }
+
+    public static void descriptografa(String texto) {
+        texto = trataTextoEntrada(texto);
+        StringBuilder textoDescriptografado = new StringBuilder();
+        for (int k = 0; k < 26; k++) {
+            for (char letra : texto.toCharArray()) {
+                int posicao = ALFABETO.indexOf(letra);
+                if (posicao != -1) {
+                    char letraDescriptografada = ALFABETO.charAt(posicao - k + 25);
+                    textoDescriptografado.append(letraDescriptografada);
+                } else {
+                    textoDescriptografado.append(letra);
+                }
+            }
+            System.out.println("Possivel texto com K = " + k + ": " + textoDescriptografado.toString());
+            textoDescriptografado.setLength(0);
+        }
+    }
+
+    public static String trataTextoEntrada(String texto) {
+        texto = texto.toLowerCase().replaceAll("\\s", "");
+        return texto;
+    }
+
     public static void main(String[] args) {
-        descriptografa();
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Informe o texto: ");
+        String texto = sc.nextLine();
+        System.out.println("Deseja criptografar ou descriptografar? (C/D)");
+        String escolha = sc.nextLine();
+        switch (escolha.toUpperCase()) {
+            case "C":
+                System.out.println("Informe o valor de K: ");
+                int kCriptografia = sc.nextInt();
+                criptografa(texto, kCriptografia);
+                break;
+            case "D":
+                descriptografa(texto);
+                break;
+            default:
+                System.out.println("Opcao invalida!");
+                break;
+        }
     }
 }
